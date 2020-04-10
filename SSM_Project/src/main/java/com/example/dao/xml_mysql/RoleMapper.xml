@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.dao.RoleMapper">
+
+    <select id="getAllRoles" resultType="java.util.Map">
+        SELECT * FROM student WHERE delete_status = false
+    </select>
+
+    <select id="getAllRoles_Total" resultType="java.util.Map">
+        SELECT * FROM student
+    </select>
+
+    <insert id="insert" parameterType="com.example.model.User">
+        insert into student(id, name, delete_status, create_date, update_date)
+        values (#{id}, #{name}, false, DATE_FORMAT(now(),"%Y-%m-%d %T"), DATE_FORMAT(now(),"%Y-%m-%d %T"))
+    </insert>
+
+    <select id="findUser" parameterType="int" resultType="java.util.Map">
+        select * from student where id=#{id}
+    </select>
+
+    <delete id="delete" parameterType="com.example.model.User">
+        delete from student where id = #{id} and delete_status = true
+    </delete>
+
+    <update id ="tombstone" parameterType="com.example.model.User">
+        update student set delete_status = true, update_date = DATE_FORMAT(now(),"%Y-%m-%d %T") where id = #{id}
+    </update>
+
+    <update id="update" parameterType="com.example.model.User">
+        update student set name = #{name} , update_date = DATE_FORMAT(now(),"%Y-%m-%d %T") where id = #{id} and not exists(
+        select * from (select * from student) as b where name = #{name}
+        )
+    </update>
+
+    <select id="getUserbyName" parameterType="com.example.model.User" resultType="java.util.Map">
+        select * from student where name = #{name}
+    </select>
+
+    <update id = "recoverUser" parameterType="com.example.model.User">
+        update student set delete_status = false, update_date = DATE_FORMAT(now(),"%Y-%m-%d %T") where id = #{id}
+    </update>
+
+
+</mapper>
